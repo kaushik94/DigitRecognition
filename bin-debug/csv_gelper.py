@@ -3,13 +3,17 @@ import csv
 def reader(file_obj):
 	reader = csv.reader(file_obj)
 	wanted = []
-	limit = 1000
+	limit = 200
+	index = 0
+	avg = (42001/9)
 	for row in reader:
 		#print len(row)
-		wanted.append(row)
-		limit -= 1
-		if limit == 0:
-			break
+		index += 1
+		if index < 200:
+			print row[0]
+			wanted.append(row)
+		if index == avg:
+			index = 0	
 	writer(wanted)
 
 def writer(wanted):
@@ -22,5 +26,5 @@ def writer(wanted):
 
 if __name__ == "__main__":
 	csv_path = "train.csv"
-	with open(csv_path, "rb") as f_obj:
+	with open(csv_path, "r") as f_obj:
 		reader(f_obj)

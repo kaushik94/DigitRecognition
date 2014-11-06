@@ -22,6 +22,7 @@
 	
 	import view.KNN;
 	import flash.geom.Rectangle;
+	import view.preprocess;
 
 
 	/**
@@ -40,7 +41,8 @@
 
 		private var desiredWidth: Number = 28;
 		private var desiredHeight: Number = 28;
-
+        private var knn:KNN;
+		private var PixelArray: Array;
 		//private var scale:Number = stage.width/desiredWidth;
 
 
@@ -123,21 +125,28 @@
 			var scaleW: Number = desiredWidth / stage.stageWidth;
 			var scaleH: Number = desiredHeight / stage.stageHeight;
 			var matrix: Matrix = new Matrix();
-			matrix.scale(scaleW, scaleH);
-
-			var smallBMD: BitmapData = new BitmapData(bigBMD.width * scaleW, bigBMD.height * scaleH, true, 0x000000);
-			smallBMD.draw(bigBMD, matrix, null, null, null, true);
-
-			var bitmap: Bitmap = new Bitmap(smallBMD, PixelSnapping.NEVER, true);
 			
+			var pp: preprocess = new preprocess(pointArray, bigBMD);
+			var croppedBMD: BitmapData = pp.crop();
+			/*matrix.scale(28/croppedBMD.width, 28/croppedBMD.height);
+			var smallBMD: BitmapData = new BitmapData(28, 28, true, 0x000000);
+			smallBMD.draw(croppedBMD, matrix, null, null, null, true);*/
+
+			var bitmap: Bitmap = new Bitmap(croppedBMD, PixelSnapping.NEVER, true);
 			addChild(bitmap);
+			PixelArray = pp.getPixelData();
 			
-			var knn:KNN = new KNN(3, 29);
-			knn.train("t.csv");
+			knn = new KNN(3, 29);
+			knn.test_data(PixelArray);
+			//knn.addEventListener("ON_NORMALISE_COMP",onNormaliseComplete);
+		}
+		
+		private function onNormaliseComplete(e:*=null): void {
+		    knn.test_data(PixelArray);
+			//knn.train_data(PixelArray);
 			//dataProxy.toJson(pointArray);
-			pointArray = null;
-			pointArray = new Array();
-
+			/*pointArray = null;
+			pointArray = new Array();*/
 		}
 
 		private function removeLines(): void {
